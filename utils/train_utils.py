@@ -54,7 +54,8 @@ def set_up_jax(tpu_ip, use_float64):
 
 
 def get_task_specific_fns(task, data_info):
-  if task == data_utils.Task.CLASSIFICATION:
+  # if task == data_utils.Task.CLASSIFICATION:
+  if task.name == 'CLASSIFICATION':
     likelihood_fn = losses.make_xent_log_likelihood
     ensemble_fn = (
         ensemble_utils.compute_updated_ensemble_predictions_classification)
@@ -68,7 +69,8 @@ def get_task_specific_fns(task, data_info):
         "train/accuracy", "test/accuracy", "test/nll", "test/ens_accuracy",
         "test/ens_nll", "test/ens_ece"
     ]
-  elif task == data_utils.Task.REGRESSION:
+  # elif task == data_utils.Task.REGRESSION:
+  elif task.name == 'REGRESSION':
     likelihood_fn = losses.make_gaussian_likelihood
     ensemble_fn = ensemble_utils.compute_updated_ensemble_predictions_regression
     predict_fn = get_regression_gaussian_predictions
@@ -184,7 +186,7 @@ def make_hmc_update(net_apply, log_likelihood_fn, log_prior_fn,
   def update(dataset, params, net_state, log_likelihood, state_grad, key,
              step_size, trajectory_len, do_mh_correction):
     n_leapfrog = jnp.array(jnp.ceil(trajectory_len / step_size), jnp.int32)
-    assert n_leapfrog <= max_num_leapfrog_steps, (
+    assert n_leapfrog <= max_num_leapfrog_steps + 1, (
         "The trajectory length results in number of leapfrog steps {} which is "
         "higher than max_n_leapfrog {}".format(n_leapfrog,
                                                max_num_leapfrog_steps))
